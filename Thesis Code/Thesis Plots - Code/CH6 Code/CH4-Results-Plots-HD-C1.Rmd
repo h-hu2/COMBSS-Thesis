@@ -1,0 +1,438 @@
+---
+title: "Thesis Plotting"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+```{r}
+# Refresh Data
+rm(list = ls())
+```
+
+```{r}
+# Refresh Terminal
+cat("\014")
+```
+```{r}
+library(tidyverse)
+
+COMBSS_OPT_MCC <- list()
+COMBSS_OPT_MCC_LB <- list()
+COMBSS_OPT_MCC_UB <- list()
+
+COMBSS_MCC <- list()
+COMBSS_MCC_LB <- list()
+COMBSS_MCC_UB <- list()
+
+
+COMBSS_OPT_F1 <- list()
+COMBSS_OPT_F1_LB <- list()
+COMBSS_OPT_F1_UB <- list()
+
+COMBSS_F1 <- list()
+COMBSS_F1_LB <- list()
+COMBSS_F1_UB <- list()
+
+
+COMBSS_OPT_PE <- list()
+COMBSS_OPT_PE_LB <- list()
+COMBSS_OPT_PE_UB <- list()
+
+COMBSS_PE <- list()
+COMBSS_PE_LB <- list()
+COMBSS_PE_UB <- list()
+
+
+COMBSS_OPT_SE <- list()
+COMBSS_OPT_SE_LB <- list()
+COMBSS_OPT_SE_UB <- list()
+
+COMBSS_SE <- list()
+COMBSS_SE_LB <- list()
+COMBSS_SE_UB <- list()
+
+
+COMBSS_OPT_SP <- list()
+COMBSS_OPT_SP_LB <- list()
+COMBSS_OPT_SP_UB <- list()
+
+COMBSS_SP <- list()
+COMBSS_SP_LB <- list()
+COMBSS_SP_UB <- list()
+
+COMBSS_OPT_TIME <- list()
+COMBSS_OPT_TIME_LB <- list()
+COMBSS_OPT_TIME_UB <- list()
+
+COMBSS_TIME <- list()
+COMBSS_TIME_LB <- list()
+COMBSS_TIME_UB <- list()
+```
+
+
+```{r}
+# Loop through SNR values and read corresponding Metric files
+N <- 50
+for (snr in 2:8) {
+  combss_path = paste0("OriginalResults/COMBSS/COMBSS-case-1-n-100-p-1000-q-20-corr-0.8-ninit-1-snr-", snr, "-ndatasets-50.csv")
+  combss_data <- read.csv(combss_path)
+
+  MCC <- combss_data$MCC
+  COMBSS_Mean <- mean(MCC)
+  COMBSS_SD <- sd(MCC)
+  COMBSS_MCC[[as.character(snr)]] <- COMBSS_Mean
+  COMBSS_MCC_LB[[as.character(snr)]] <- COMBSS_Mean - COMBSS_SD / sqrt(N)
+  COMBSS_MCC_UB[[as.character(snr)]] <- COMBSS_Mean + COMBSS_SD / sqrt(N)
+  
+  # Prediction Error Results
+  PE <- combss_data$PE
+  COMBSS_Mean <- mean(PE)
+  COMBSS_SD <- sd(PE)
+  COMBSS_PE[[as.character(snr)]] <- COMBSS_Mean
+  COMBSS_PE_LB[[as.character(snr)]] <- COMBSS_Mean - COMBSS_SD / sqrt(N)
+  COMBSS_PE_UB[[as.character(snr)]] <- COMBSS_Mean + COMBSS_SD / sqrt(N)
+  
+
+  # F1 Score Results
+  F1 <- combss_data$F1_score
+  COMBSS_Mean <- mean(F1)
+  COMBSS_SD <- sd(F1)
+  COMBSS_F1[[as.character(snr)]] <- COMBSS_Mean
+  COMBSS_F1_LB[[as.character(snr)]] <- COMBSS_Mean - COMBSS_SD / sqrt(N)
+  COMBSS_F1_UB[[as.character(snr)]] <- COMBSS_Mean + COMBSS_SD / sqrt(N)
+  
+  
+  # Sensitivity Results
+  SE <- combss_data$Sensitivity
+  COMBSS_Mean <- mean(SE)
+  COMBSS_SD <- sd(SE)
+  COMBSS_SE[[as.character(snr)]] <- COMBSS_Mean
+  COMBSS_SE_LB[[as.character(snr)]] <- COMBSS_Mean - COMBSS_SD / sqrt(N)
+  COMBSS_SE_UB[[as.character(snr)]] <- COMBSS_Mean + COMBSS_SD / sqrt(N)
+  
+  # Specificity Results
+  SP <- combss_data$Specificity
+  COMBSS_Mean <- mean(SP)
+  COMBSS_SD <- sd(SP)
+  COMBSS_SP[[as.character(snr)]] <- COMBSS_Mean
+  COMBSS_SP_LB[[as.character(snr)]] <- COMBSS_Mean - COMBSS_SD / sqrt(N)
+  COMBSS_SP_UB[[as.character(snr)]] <- COMBSS_Mean + COMBSS_SD / sqrt(N)
+}
+```
+
+```{r}
+# Loop through SNR values and read corresponding Metric files
+N <- 50
+for (snr in 2:8) {
+  combss_path = paste0("ThesisResults/COMBSS-Original/COMBSSV0-case-1-n-100-p-1000-q-20-corr-0.8-ninit-1-snr-", snr, "-ndatasets-50-nlam-25-eta-0.001.csv")
+  combss_data <- read.csv(combss_path)
+
+  # Time Results
+  TIME <- combss_data$Time
+  COMBSS_Mean <- mean(TIME)
+  COMBSS_SD <- sd(TIME)
+  COMBSS_TIME[[as.character(snr)]] <- COMBSS_Mean
+  COMBSS_TIME_LB[[as.character(snr)]] <- COMBSS_Mean - COMBSS_SD / sqrt(N)
+  COMBSS_TIME_UB[[as.character(snr)]] <- COMBSS_Mean + COMBSS_SD / sqrt(N)
+}
+```
+
+```{r}
+# Loop through SNR values and read corresponding Metric files
+N <- 50
+for (snr in 2:8) {
+  COMBSS_OPT_path = paste0("ThesisResults/COMBSS-Optimal/COMBSS-Normalised-Improved-case-1-n-100-p-1000-q-20-corr-0.8-ninit-1-snr-", snr, "-ndatasets-50-nlam-25-eta-0.001.csv")
+  COMBSS_OPT_data <- read.csv(COMBSS_OPT_path)
+
+  MCC <- COMBSS_OPT_data$MCC
+  COMBSS_OPT_Mean <- mean(MCC)
+  COMBSS_OPT_SD <- sd(MCC)
+  COMBSS_OPT_MCC[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_MCC_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_MCC_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+  
+  # Prediction Error Results
+  PE <- COMBSS_OPT_data$PE
+  COMBSS_OPT_Mean <- mean(PE)
+  COMBSS_OPT_SD <- sd(PE)
+  COMBSS_OPT_PE[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_PE_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_PE_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+  
+
+  # F1 Score Results
+  F1 <- COMBSS_OPT_data$F1_score
+  COMBSS_OPT_Mean <- mean(F1)
+  COMBSS_OPT_SD <- sd(F1)
+  COMBSS_OPT_F1[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_F1_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_F1_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+  
+  
+  # Sensitivity Results
+  SE <- COMBSS_OPT_data$Sensitivity
+  COMBSS_OPT_Mean <- mean(SE)
+  COMBSS_OPT_SD <- sd(SE)
+  COMBSS_OPT_SE[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_SE_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_SE_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+  
+  # Specificity Results
+  SP <- COMBSS_OPT_data$Specificity
+  COMBSS_OPT_Mean <- mean(SP)
+  COMBSS_OPT_SD <- sd(SP)
+  COMBSS_OPT_SP[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_SP_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_SP_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+  
+  # Time Results
+  TIME <- COMBSS_OPT_data$Time
+  COMBSS_OPT_Mean <- mean(TIME)
+  COMBSS_OPT_SD <- sd(TIME)
+  COMBSS_OPT_TIME[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_TIME_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_TIME_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+}
+```
+
+```{r}
+convert_list_to_df <- function(means, lower, upper, method_name) {
+  data.frame(
+    SNR = as.numeric(names(means)),
+    Mean = unlist(means),
+    Lower = unlist(lower),
+    Upper = unlist(upper),
+    Method = method_name
+  )
+}
+
+# Convert MCC Data
+COMBSS_MCC_Data <- convert_list_to_df(COMBSS_MCC, COMBSS_MCC_LB, COMBSS_MCC_UB, "Original COMBSS")
+COMBSS_OPT_MCC_Data <- convert_list_to_df(COMBSS_OPT_MCC, COMBSS_OPT_MCC_LB, COMBSS_OPT_MCC_UB, "COMBSS with Feature Scaling")
+
+MCC_Data <- rbind(COMBSS_MCC_Data, COMBSS_OPT_MCC_Data)
+
+# Convert PE Data
+COMBSS_PE_Data <- convert_list_to_df(COMBSS_PE, COMBSS_PE_LB, COMBSS_PE_UB, "Original COMBSS")
+COMBSS_OPT_PE_Data <- convert_list_to_df(COMBSS_OPT_PE, COMBSS_OPT_PE_LB, COMBSS_OPT_PE_UB, "COMBSS with Feature Scaling")
+
+PE_Data <- rbind(COMBSS_PE_Data, COMBSS_OPT_PE_Data)
+
+# Convert F1 Data
+COMBSS_F1_Data <- convert_list_to_df(COMBSS_F1, COMBSS_F1_LB, COMBSS_F1_UB, "Original COMBSS")
+COMBSS_OPT_F1_Data <- convert_list_to_df(COMBSS_OPT_F1, COMBSS_OPT_F1_LB, COMBSS_OPT_F1_UB, "COMBSS with Feature Scaling")
+
+F1_Data <- rbind(COMBSS_F1_Data, COMBSS_OPT_F1_Data)
+
+# Convert SE Data
+COMBSS_SE_Data <- convert_list_to_df(COMBSS_SE, COMBSS_SE_LB, COMBSS_SE_UB, "Original COMBSS")
+COMBSS_OPT_SE_Data <- convert_list_to_df(COMBSS_OPT_SE, COMBSS_OPT_SE_LB, COMBSS_OPT_SE_UB, "COMBSS with Feature Scaling")
+
+SE_Data <- rbind(COMBSS_SE_Data, COMBSS_OPT_SE_Data)
+
+# Convert SP Data
+COMBSS_SP_Data <- convert_list_to_df(COMBSS_SP, COMBSS_SP_LB, COMBSS_SP_UB, "Original COMBSS")
+COMBSS_OPT_SP_Data <- convert_list_to_df(COMBSS_OPT_SP, COMBSS_OPT_SP_LB, COMBSS_OPT_SP_UB, "COMBSS with Feature Scaling")
+
+SP_Data <- rbind(COMBSS_SP_Data, COMBSS_OPT_SP_Data)
+
+# Convert Time Data
+COMBSS_TIME_Data <- convert_list_to_df(COMBSS_TIME, COMBSS_TIME_LB, COMBSS_TIME_UB, "Original COMBSS")
+COMBSS_OPT_TIME_Data <- convert_list_to_df(COMBSS_OPT_TIME, COMBSS_OPT_TIME_LB, COMBSS_OPT_TIME_UB, "COMBSS, Refined Gradient")
+
+TIME_Data <- rbind(COMBSS_TIME_Data, COMBSS_OPT_TIME_Data)
+```
+
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+MCC_HD <- # Base plot with error bars, lines, and points
+ggplot(MCC_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(MCC_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 1", x = "Signal to Noise Ratio", y = "MCC") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and bold title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "Original COMBSS" = "salmon",
+    "COMBSS with Feature Scaling" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+MCC_HD
+ggsave("CH4-MCC-HD-Case-1.png", plot = MCC_HD, dpi = 1200)
+
+```
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+PE_HD <- # Base plot with error bars, lines, and points
+ggplot(PE_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 1", x = "Signal to Noise Ratio", y = "Prediction Error") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and bold title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "Original COMBSS" = "salmon",
+    "COMBSS with Feature Scaling" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+PE_HD
+ggsave("CH4-PE_HD-Case-1.png", plot = PE_HD, dpi = 1200)
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+F1_HD <- # Base plot with error bars, lines, and points
+ggplot(F1_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 1", x = "Signal to Noise Ratio", y = "F1 Score") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and bold title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "Original COMBSS" = "salmon",
+    "COMBSS with Feature Scaling" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+F1_HD
+ggsave("CH4-F1_HD-Case-1.png", plot = F1_HD, dpi = 1200)
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+SE_HD <- # Base plot with error bars, lines, and points
+ggplot(SE_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 1", x = "Signal to Noise Ratio", y = "Sensitivity") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and bold title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "Original COMBSS" = "salmon",
+    "COMBSS with Feature Scaling" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+SE_HD
+ggsave("CH4-SE_HD-Case-1.png", plot = SE_HD, dpi = 1200)
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+SP_HD <- # Base plot with error bars, lines, and points
+ggplot(SP_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 1", x = "Signal to Noise Ratio", y = "Specificity") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and bold title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "Original COMBSS" = "salmon",
+    "COMBSS with Feature Scaling" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+SP_HD
+ggsave("CH4-SP_HD-Case-1.png", plot = SP_HD, dpi = 1200)
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+TIME_HD <- # Base plot with error bars, lines, and points
+ggplot(TIME_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(TIME_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 1", x = "Signal to Noise Ratio", y = "Average Time per Dataset") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and bold title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "Original COMBSS" = "salmon",
+    "COMBSS, Refined Gradient" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+TIME_HD
+ggsave("CH4-TIME_HD-Case-1.png", plot = TIME_HD, dpi = 1200)
+```

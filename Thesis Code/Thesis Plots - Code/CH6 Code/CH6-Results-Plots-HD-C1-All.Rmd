@@ -1,0 +1,767 @@
+---
+title: "Thesis Plotting"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+```{r}
+# Refresh Data
+rm(list = ls())
+```
+
+```{r}
+# Refresh Terminal
+cat("\014")
+```
+
+```{r}
+library(tidyverse)
+
+# For MCC
+COMBSS_OPT_MCC <- list()
+COMBSS_OPT_MCC_LB <- list()
+COMBSS_OPT_MCC_UB <- list()
+
+COMBSSV1_MCC <- list()
+COMBSSV1_MCC_LB <- list()
+COMBSSV1_MCC_UB <- list()
+
+COMBSSV2_MCC <- list()
+COMBSSV2_MCC_LB <- list()
+COMBSSV2_MCC_UB <- list()
+
+# For F1
+COMBSS_OPT_F1 <- list()
+COMBSS_OPT_F1_LB <- list()
+COMBSS_OPT_F1_UB <- list()
+
+COMBSSV1_F1 <- list()
+COMBSSV1_F1_LB <- list()
+COMBSSV1_F1_UB <- list()
+
+COMBSSV2_F1 <- list()
+COMBSSV2_F1_LB <- list()
+COMBSSV2_F1_UB <- list()
+
+# For PE
+COMBSS_OPT_PE <- list()
+COMBSS_OPT_PE_LB <- list()
+COMBSS_OPT_PE_UB <- list()
+
+COMBSSV1_PE <- list()
+COMBSSV1_PE_LB <- list()
+COMBSSV1_PE_UB <- list()
+
+COMBSSV2_PE <- list()
+COMBSSV2_PE_LB <- list()
+COMBSSV2_PE_UB <- list()
+
+# Repeat for other metrics: ACC, SE, SP, TIME
+COMBSS_OPT_ACC <- list()
+COMBSS_OPT_ACC_LB <- list()
+COMBSS_OPT_ACC_UB <- list()
+
+COMBSSV1_ACC <- list()
+COMBSSV1_ACC_LB <- list()
+COMBSSV1_ACC_UB <- list()
+
+COMBSSV2_ACC <- list()
+COMBSSV2_ACC_LB <- list()
+COMBSSV2_ACC_UB <- list()
+
+# SE
+COMBSS_OPT_SE <- list()
+COMBSS_OPT_SE_LB <- list()
+COMBSS_OPT_SE_UB <- list()
+
+COMBSSV1_SE <- list()
+COMBSSV1_SE_LB <- list()
+COMBSSV1_SE_UB <- list()
+
+COMBSSV2_SE <- list()
+COMBSSV2_SE_LB <- list()
+COMBSSV2_SE_UB <- list()
+
+# SP
+COMBSS_OPT_SP <- list()
+COMBSS_OPT_SP_LB <- list()
+COMBSS_OPT_SP_UB <- list()
+
+COMBSSV1_SP <- list()
+COMBSSV1_SP_LB <- list()
+COMBSSV1_SP_UB <- list()
+
+COMBSSV2_SP <- list()
+COMBSSV2_SP_LB <- list()
+COMBSSV2_SP_UB <- list()
+
+# TIME
+COMBSS_OPT_TIME <- list()
+COMBSS_OPT_TIME_LB <- list()
+COMBSS_OPT_TIME_UB <- list()
+
+COMBSSV1_TIME <- list()
+COMBSSV1_TIME_LB <- list()
+COMBSSV1_TIME_UB <- list()
+
+COMBSSV2_TIME <- list()
+COMBSSV2_TIME_LB <- list()
+COMBSSV2_TIME_UB <- list()
+
+FS_MCC <- list()
+FS_MCC_LB <- list()
+FS_MCC_UB <- list()
+
+LASSO_MCC <- list()
+LASSO_MCC_LB <- list()
+LASSO_MCC_UB <- list()
+
+L0Learn_MCC <- list()
+L0Learn_MCC_LB <- list()
+L0Learn_MCC_UB <- list()
+
+
+FS_F1 <- list()
+FS_F1_LB <- list()
+FS_F1_UB <- list()
+
+LASSO_F1 <- list()
+LASSO_F1_LB <- list()
+LASSO_F1_UB <- list()
+
+L0Learn_F1 <- list()
+L0Learn_F1_LB <- list()
+L0Learn_F1_UB <- list()
+
+
+FS_PE <- list()
+FS_PE_LB <- list()
+FS_PE_UB <- list()
+
+LASSO_PE <- list()
+LASSO_PE_LB <- list()
+LASSO_PE_UB <- list()
+
+L0Learn_PE <- list()
+L0Learn_PE_LB <- list()
+L0Learn_PE_UB <- list()
+
+
+FS_SE <- list()
+FS_SE_LB <- list()
+FS_SE_UB <- list()
+
+LASSO_SE <- list()
+LASSO_SE_LB <- list()
+LASSO_SE_UB <- list()
+
+L0Learn_SE <- list()
+L0Learn_SE_LB <- list()
+L0Learn_SE_UB <- list()
+
+
+FS_SP <- list()
+FS_SP_LB <- list()
+FS_SP_UB <- list()
+
+LASSO_SP <- list()
+LASSO_SP_LB <- list()
+LASSO_SP_UB <- list()
+
+L0Learn_SP <- list()
+L0Learn_SP_LB <- list()
+L0Learn_SP_UB <- list()
+```
+
+```{r}
+# Loop through SNR values and read corresponding Metric files
+N <- 50
+for (snr in 2:8) {
+  file_path <- paste0("OriginalResults/OtherMethods/HighC1/Result-n-100-p-1000-SNR-", snr, "-rho-0.8-case-1-nsim-50.RData")
+  load(file_path)
+  
+  # MCC Results
+  MCC <- simu.result$MCC
+  FS_Mean <- mean(MCC[,2])
+  FS_SD <- sd(MCC[,2])
+  FS_MCC[[as.character(snr)]] <- FS_Mean
+  FS_MCC_LB[[as.character(snr)]] <- FS_Mean - FS_SD / sqrt(N)
+  FS_MCC_UB[[as.character(snr)]] <- FS_Mean + FS_SD / sqrt(N)
+  
+  LASSO_Mean <- mean(MCC[,4])
+  LASSO_SD <- sd(MCC[,4])
+  LASSO_MCC[[as.character(snr)]] <- LASSO_Mean
+  LASSO_MCC_LB[[as.character(snr)]] <- LASSO_Mean - LASSO_SD / sqrt(N)
+  LASSO_MCC_UB[[as.character(snr)]] <- LASSO_Mean + LASSO_SD / sqrt(N)
+  
+  L0Learn_Mean <- mean(MCC[,8])
+  L0Learn_SD <- sd(MCC[,8])
+  L0Learn_MCC[[as.character(snr)]] <- L0Learn_Mean
+  L0Learn_MCC_LB[[as.character(snr)]] <- L0Learn_Mean - L0Learn_SD / sqrt(N)
+  L0Learn_MCC_UB[[as.character(snr)]] <- L0Learn_Mean + L0Learn_SD / sqrt(N)
+  
+  # Prediction Error Results
+  PE <- simu.result$PE
+  FS_Mean <- mean(PE[,2])
+  FS_SD <- sd(PE[,2])
+  FS_PE[[as.character(snr)]] <- FS_Mean
+  FS_PE_LB[[as.character(snr)]] <- FS_Mean - FS_SD / sqrt(N)
+  FS_PE_UB[[as.character(snr)]] <- FS_Mean + FS_SD / sqrt(N)
+  
+  LASSO_Mean <- mean(PE[,4])
+  LASSO_SD <- sd(PE[,4])
+  LASSO_PE[[as.character(snr)]] <- LASSO_Mean
+  LASSO_PE_LB[[as.character(snr)]] <- LASSO_Mean - LASSO_SD / sqrt(N)
+  LASSO_PE_UB[[as.character(snr)]] <- LASSO_Mean + LASSO_SD / sqrt(N)
+  
+  L0Learn_Mean <- mean(PE[,8])
+  L0Learn_SD <- sd(PE[,8])
+  L0Learn_PE[[as.character(snr)]] <- L0Learn_Mean
+  L0Learn_PE_LB[[as.character(snr)]] <- L0Learn_Mean - L0Learn_SD / sqrt(N)
+  L0Learn_PE_UB[[as.character(snr)]] <- L0Learn_Mean + L0Learn_SD / sqrt(N)
+  
+  
+  # F1 Score Results
+  F1 <- simu.result$F1
+  FS_Mean <- mean(F1[,2])
+  FS_SD <- sd(F1[,2])
+  FS_F1[[as.character(snr)]] <- FS_Mean
+  FS_F1_LB[[as.character(snr)]] <- FS_Mean - FS_SD / sqrt(N)
+  FS_F1_UB[[as.character(snr)]] <- FS_Mean + FS_SD / sqrt(N)
+  
+  LASSO_Mean <- mean(F1[,4])
+  LASSO_SD <- sd(F1[,4])
+  LASSO_F1[[as.character(snr)]] <- LASSO_Mean
+  LASSO_F1_LB[[as.character(snr)]] <- LASSO_Mean - LASSO_SD / sqrt(N)
+  LASSO_F1_UB[[as.character(snr)]] <- LASSO_Mean + LASSO_SD / sqrt(N)
+  
+  L0Learn_Mean <- mean(F1[,8])
+  L0Learn_SD <- sd(F1[,8])
+  L0Learn_F1[[as.character(snr)]] <- L0Learn_Mean
+  L0Learn_F1_LB[[as.character(snr)]] <- L0Learn_Mean - L0Learn_SD / sqrt(N)
+  L0Learn_F1_UB[[as.character(snr)]] <- L0Learn_Mean + L0Learn_SD / sqrt(N)
+  
+  # Sensitivity Results
+  SE <- simu.result$Sens
+  FS_Mean <- mean(SE[,2])
+  FS_SD <- sd(SE[,2])
+  FS_SE[[as.character(snr)]] <- FS_Mean
+  FS_SE_LB[[as.character(snr)]] <- FS_Mean - FS_SD / sqrt(N)
+  FS_SE_UB[[as.character(snr)]] <- FS_Mean + FS_SD / sqrt(N)
+  
+  LASSO_Mean <- mean(SE[,4])
+  LASSO_SD <- sd(SE[,4])
+  LASSO_SE[[as.character(snr)]] <- LASSO_Mean
+  LASSO_SE_LB[[as.character(snr)]] <- LASSO_Mean - LASSO_SD / sqrt(N)
+  LASSO_SE_UB[[as.character(snr)]] <- LASSO_Mean + LASSO_SD / sqrt(N)
+  
+  L0Learn_Mean <- mean(SE[,8])
+  L0Learn_SD <- sd(SE[,8])
+  L0Learn_SE[[as.character(snr)]] <- L0Learn_Mean
+  L0Learn_SE_LB[[as.character(snr)]] <- L0Learn_Mean - L0Learn_SD / sqrt(N)
+  L0Learn_SE_UB[[as.character(snr)]] <- L0Learn_Mean + L0Learn_SD / sqrt(N)
+  
+  # Specificity Results
+  SP <- simu.result$Spe
+  FS_Mean <- mean(SP[,2])
+  FS_SD <- sd(SP[,2])
+  FS_SP[[as.character(snr)]] <- FS_Mean
+  FS_SP_LB[[as.character(snr)]] <- FS_Mean - FS_SD / sqrt(N)
+  FS_SP_UB[[as.character(snr)]] <- FS_Mean + FS_SD / sqrt(N)
+  
+  LASSO_Mean <- mean(SP[,4])
+  LASSO_SD <- sd(SP[,4])
+  LASSO_SP[[as.character(snr)]] <- LASSO_Mean
+  LASSO_SP_LB[[as.character(snr)]] <- LASSO_Mean - LASSO_SD / sqrt(N)
+  LASSO_SP_UB[[as.character(snr)]] <- LASSO_Mean + LASSO_SD / sqrt(N)
+  
+  L0Learn_Mean <- mean(SP[,8])
+  L0Learn_SD <- sd(SP[,8])
+  L0Learn_SP[[as.character(snr)]] <- L0Learn_Mean
+  L0Learn_SP_LB[[as.character(snr)]] <- L0Learn_Mean - L0Learn_SD / sqrt(N)
+  L0Learn_SP_UB[[as.character(snr)]] <- L0Learn_Mean + L0Learn_SD / sqrt(N)
+}
+```
+
+```{r}
+# Loop through SNR values and read corresponding Metric files
+N <- 50
+for (snr in 2:8) {
+  COMBSS_OPT_path = paste0("ThesisResults/COMBSS-Optimal/COMBSS-Normalised-Improved-case-1-n-100-p-1000-q-20-corr-0.8-ninit-1-snr-", snr, "-ndatasets-50-nlam-25-eta-0.001.csv")
+  COMBSS_OPT_data <- read.csv(COMBSS_OPT_path)
+
+  MCC <- COMBSS_OPT_data$MCC
+  COMBSS_OPT_Mean <- mean(MCC)
+  COMBSS_OPT_SD <- sd(MCC)
+  COMBSS_OPT_MCC[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_MCC_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_MCC_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+  
+  # Prediction Error Results
+  PE <- COMBSS_OPT_data$PE
+  COMBSS_OPT_Mean <- mean(PE)
+  COMBSS_OPT_SD <- sd(PE)
+  COMBSS_OPT_PE[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_PE_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_PE_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+  
+  # F1 Score Results
+  F1 <- COMBSS_OPT_data$F1_score
+  COMBSS_OPT_Mean <- mean(F1)
+  COMBSS_OPT_SD <- sd(F1)
+  COMBSS_OPT_F1[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_F1_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_F1_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+
+  # Accuracy Results
+  ACC <- COMBSS_OPT_data$Accuracy
+  COMBSS_OPT_Mean <- mean(ACC)
+  COMBSS_OPT_SD <- sd(ACC)
+  COMBSS_OPT_ACC[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_ACC_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_ACC_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+  
+  
+  # Sensitivity Results
+  SE <- COMBSS_OPT_data$Sensitivity
+  COMBSS_OPT_Mean <- mean(SE)
+  COMBSS_OPT_SD <- sd(SE)
+  COMBSS_OPT_SE[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_SE_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_SE_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+  
+  # Specificity Results
+  SP <- COMBSS_OPT_data$Specificity
+  COMBSS_OPT_Mean <- mean(SP)
+  COMBSS_OPT_SD <- sd(SP)
+  COMBSS_OPT_SP[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_SP_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_SP_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+  
+  # Time Results
+  TIME <- COMBSS_OPT_data$Time
+  COMBSS_OPT_Mean <- mean(TIME)
+  COMBSS_OPT_SD <- sd(TIME)
+  COMBSS_OPT_TIME[[as.character(snr)]] <- COMBSS_OPT_Mean
+  COMBSS_OPT_TIME_LB[[as.character(snr)]] <- COMBSS_OPT_Mean - COMBSS_OPT_SD / sqrt(N)
+  COMBSS_OPT_TIME_UB[[as.character(snr)]] <- COMBSS_OPT_Mean + COMBSS_OPT_SD / sqrt(N)
+}
+```
+
+
+```{r}
+# Loop through SNR values and read corresponding Metric files
+N <- 50
+for (snr in 2:8) {
+  COMBSSV1_path = paste0("ThesisResults/COMBSSV1-Optimal/COMBSSV1-Scaled-case-1-n-100-p-1000-q-20-corr-0.8-ninit-1-snr-", snr, "-ndatasets-50-nlam-25-eta-0.001.csv")
+  COMBSSV1_data <- read.csv(COMBSSV1_path)
+
+  MCC <- COMBSSV1_data$MCC
+  COMBSSV1_Mean <- mean(MCC)
+  COMBSSV1_SD <- sd(MCC)
+  COMBSSV1_MCC[[as.character(snr)]] <- COMBSSV1_Mean
+  COMBSSV1_MCC_LB[[as.character(snr)]] <- COMBSSV1_Mean - COMBSSV1_SD / sqrt(N)
+  COMBSSV1_MCC_UB[[as.character(snr)]] <- COMBSSV1_Mean + COMBSSV1_SD / sqrt(N)
+  
+  # Prediction Error Results
+  PE <- COMBSSV1_data$PE
+  COMBSSV1_Mean <- mean(PE)
+  COMBSSV1_SD <- sd(PE)
+  COMBSSV1_PE[[as.character(snr)]] <- COMBSSV1_Mean
+  COMBSSV1_PE_LB[[as.character(snr)]] <- COMBSSV1_Mean - COMBSSV1_SD / sqrt(N)
+  COMBSSV1_PE_UB[[as.character(snr)]] <- COMBSSV1_Mean + COMBSSV1_SD / sqrt(N)
+  
+  # F1 Score Results
+  F1 <- COMBSSV1_data$F1_score
+  COMBSSV1_Mean <- mean(F1)
+  COMBSSV1_SD <- sd(F1)
+  COMBSSV1_F1[[as.character(snr)]] <- COMBSSV1_Mean
+  COMBSSV1_F1_LB[[as.character(snr)]] <- COMBSSV1_Mean - COMBSSV1_SD / sqrt(N)
+  COMBSSV1_F1_UB[[as.character(snr)]] <- COMBSSV1_Mean + COMBSSV1_SD / sqrt(N)
+
+  # Accuracy Results
+  ACC <- COMBSSV1_data$Accuracy
+  COMBSSV1_Mean <- mean(ACC)
+  COMBSSV1_SD <- sd(ACC)
+  COMBSSV1_ACC[[as.character(snr)]] <- COMBSSV1_Mean
+  COMBSSV1_ACC_LB[[as.character(snr)]] <- COMBSSV1_Mean - COMBSSV1_SD / sqrt(N)
+  COMBSSV1_ACC_UB[[as.character(snr)]] <- COMBSSV1_Mean + COMBSSV1_SD / sqrt(N)
+  
+  
+  # Sensitivity Results
+  SE <- COMBSSV1_data$Sensitivity
+  COMBSSV1_Mean <- mean(SE)
+  COMBSSV1_SD <- sd(SE)
+  COMBSSV1_SE[[as.character(snr)]] <- COMBSSV1_Mean
+  COMBSSV1_SE_LB[[as.character(snr)]] <- COMBSSV1_Mean - COMBSSV1_SD / sqrt(N)
+  COMBSSV1_SE_UB[[as.character(snr)]] <- COMBSSV1_Mean + COMBSSV1_SD / sqrt(N)
+  
+  # Specificity Results
+  SP <- COMBSSV1_data$Specificity
+  COMBSSV1_Mean <- mean(SP)
+  COMBSSV1_SD <- sd(SP)
+  COMBSSV1_SP[[as.character(snr)]] <- COMBSSV1_Mean
+  COMBSSV1_SP_LB[[as.character(snr)]] <- COMBSSV1_Mean - COMBSSV1_SD / sqrt(N)
+  COMBSSV1_SP_UB[[as.character(snr)]] <- COMBSSV1_Mean + COMBSSV1_SD / sqrt(N)
+  
+  # Time Results
+  TIME <- COMBSSV1_data$Time
+  COMBSSV1_Mean <- mean(TIME)
+  COMBSSV1_SD <- sd(TIME)
+  COMBSSV1_TIME[[as.character(snr)]] <- COMBSSV1_Mean
+  COMBSSV1_TIME_LB[[as.character(snr)]] <- COMBSSV1_Mean - COMBSSV1_SD / sqrt(N)
+  COMBSSV1_TIME_UB[[as.character(snr)]] <- COMBSSV1_Mean + COMBSSV1_SD / sqrt(N)
+}
+```
+
+```{r}
+# Loop through SNR values and read corresponding Metric files
+
+N <- 50
+for (snr in 2:8) {
+  COMBSSV2_path = paste0("ThesisResults/COMBSSV2-Optimal/COMBSSV2-Improved-case-1-n-100-p-1000-q-20-corr-0.8-ninit-1-snr-", snr, "-ndatasets-50-nlam-25-eta-0.001.csv")
+  COMBSSV2_data <- read.csv(COMBSSV2_path)
+
+  MCC <- COMBSSV2_data$MCC
+  COMBSSV2_Mean <- mean(MCC)
+  COMBSSV2_SD <- sd(MCC)
+  COMBSSV2_MCC[[as.character(snr)]] <- COMBSSV2_Mean
+  COMBSSV2_MCC_LB[[as.character(snr)]] <- COMBSSV2_Mean - COMBSSV2_SD / sqrt(N)
+  COMBSSV2_MCC_UB[[as.character(snr)]] <- COMBSSV2_Mean + COMBSSV2_SD / sqrt(N)
+  
+  # Prediction Error Results
+  PE <- COMBSSV2_data$PE
+  COMBSSV2_Mean <- mean(PE)
+  COMBSSV2_SD <- sd(PE)
+  COMBSSV2_PE[[as.character(snr)]] <- COMBSSV2_Mean
+  COMBSSV2_PE_LB[[as.character(snr)]] <- COMBSSV2_Mean - COMBSSV2_SD / sqrt(N)
+  COMBSSV2_PE_UB[[as.character(snr)]] <- COMBSSV2_Mean + COMBSSV2_SD / sqrt(N)
+  
+  # F1 Score Results
+  F1 <- COMBSSV2_data$F1_score
+  COMBSSV2_Mean <- mean(F1)
+  COMBSSV2_SD <- sd(F1)
+  COMBSSV2_F1[[as.character(snr)]] <- COMBSSV2_Mean
+  COMBSSV2_F1_LB[[as.character(snr)]] <- COMBSSV2_Mean - COMBSSV2_SD / sqrt(N)
+  COMBSSV2_F1_UB[[as.character(snr)]] <- COMBSSV2_Mean + COMBSSV2_SD / sqrt(N)
+
+  # Accuracy Results
+  ACC <- COMBSSV2_data$Accuracy
+  COMBSSV2_Mean <- mean(ACC)
+  COMBSSV2_SD <- sd(ACC)
+  COMBSSV2_ACC[[as.character(snr)]] <- COMBSSV2_Mean
+  COMBSSV2_ACC_LB[[as.character(snr)]] <- COMBSSV2_Mean - COMBSSV2_SD / sqrt(N)
+  COMBSSV2_ACC_UB[[as.character(snr)]] <- COMBSSV2_Mean + COMBSSV2_SD / sqrt(N)
+  
+  
+  # Sensitivity Results
+  SE <- COMBSSV2_data$Sensitivity
+  COMBSSV2_Mean <- mean(SE)
+  COMBSSV2_SD <- sd(SE)
+  COMBSSV2_SE[[as.character(snr)]] <- COMBSSV2_Mean
+  COMBSSV2_SE_LB[[as.character(snr)]] <- COMBSSV2_Mean - COMBSSV2_SD / sqrt(N)
+  COMBSSV2_SE_UB[[as.character(snr)]] <- COMBSSV2_Mean + COMBSSV2_SD / sqrt(N)
+  
+  # Specificity Results
+  SP <- COMBSSV2_data$Specificity
+  COMBSSV2_Mean <- mean(SP)
+  COMBSSV2_SD <- sd(SP)
+  COMBSSV2_SP[[as.character(snr)]] <- COMBSSV2_Mean
+  COMBSSV2_SP_LB[[as.character(snr)]] <- COMBSSV2_Mean - COMBSSV2_SD / sqrt(N)
+  COMBSSV2_SP_UB[[as.character(snr)]] <- COMBSSV2_Mean + COMBSSV2_SD / sqrt(N)
+  
+  # Time Results
+  TIME <- COMBSSV2_data$Time
+  COMBSSV2_Mean <- mean(TIME)
+  COMBSSV2_SD <- sd(TIME)
+  COMBSSV2_TIME[[as.character(snr)]] <- COMBSSV2_Mean
+  COMBSSV2_TIME_LB[[as.character(snr)]] <- COMBSSV2_Mean - COMBSSV2_SD / sqrt(N)
+  COMBSSV2_TIME_UB[[as.character(snr)]] <- COMBSSV2_Mean + COMBSSV2_SD / sqrt(N)
+}
+```
+
+```{r}
+convert_list_to_df <- function(means, lower, upper, method_name) {
+  data.frame(
+    SNR = as.numeric(names(means)),
+    Mean = unlist(means),
+    Lower = unlist(lower),
+    Upper = unlist(upper),
+    Method = method_name
+  )
+}
+
+# Convert MCC Data
+COMBSSV1_MCC_Data <- convert_list_to_df(COMBSSV1_MCC, COMBSSV1_MCC_LB, COMBSSV1_MCC_UB, "COMBSS-Mod: FGD")
+COMBSSV2_MCC_Data <- convert_list_to_df(COMBSSV2_MCC, COMBSSV2_MCC_LB, COMBSSV2_MCC_UB, "COMBSS-Mod: BCD")
+COMBSS_OPT_MCC_Data <- convert_list_to_df(COMBSS_OPT_MCC, COMBSS_OPT_MCC_LB, COMBSS_OPT_MCC_UB, "Refined COMBSS")
+LASSO_MCC_Data <- convert_list_to_df(LASSO_MCC, LASSO_MCC_LB, LASSO_MCC_UB, "LASSO")
+FS_MCC_Data <- convert_list_to_df(FS_MCC, FS_MCC_LB, FS_MCC_UB, "FS")
+L0Learn_MCC_Data <- convert_list_to_df(L0Learn_MCC, L0Learn_MCC_LB, L0Learn_MCC_UB, "L0Learn")
+
+MCC_Data <- rbind(COMBSSV1_MCC_Data, COMBSSV2_MCC_Data, COMBSS_OPT_MCC_Data, LASSO_MCC_Data, FS_MCC_Data, L0Learn_MCC_Data)
+
+# Convert PE Data
+COMBSSV1_PE_Data <- convert_list_to_df(COMBSSV1_PE, COMBSSV1_PE_LB, COMBSSV1_PE_UB, "COMBSS-Mod: FGD")
+COMBSSV2_PE_Data <- convert_list_to_df(COMBSSV2_PE, COMBSSV2_PE_LB, COMBSSV2_PE_UB, "COMBSS-Mod: BCD")
+COMBSS_OPT_PE_Data <- convert_list_to_df(COMBSS_OPT_PE, COMBSS_OPT_PE_LB, COMBSS_OPT_PE_UB, "Refined COMBSS")
+LASSO_PE_Data <- convert_list_to_df(LASSO_PE, LASSO_PE_LB, LASSO_PE_UB, "LASSO")
+FS_PE_Data <- convert_list_to_df(FS_PE, FS_PE_LB, FS_PE_UB, "FS")
+L0Learn_PE_Data <- convert_list_to_df(L0Learn_PE, L0Learn_PE_LB, L0Learn_PE_UB, "L0Learn")
+
+PE_Data <- rbind(COMBSSV1_PE_Data, COMBSSV2_PE_Data, COMBSS_OPT_PE_Data, LASSO_PE_Data, FS_PE_Data, L0Learn_PE_Data)
+
+# Convert F1 Data
+COMBSSV1_F1_Data <- convert_list_to_df(COMBSSV1_F1, COMBSSV1_F1_LB, COMBSSV1_F1_UB, "COMBSS-Mod: FGD")
+COMBSSV2_F1_Data <- convert_list_to_df(COMBSSV2_F1, COMBSSV2_F1_LB, COMBSSV2_F1_UB, "COMBSS-Mod: BCD")
+COMBSS_OPT_F1_Data <- convert_list_to_df(COMBSS_OPT_F1, COMBSS_OPT_F1_LB, COMBSS_OPT_F1_UB, "Refined COMBSS")
+LASSO_F1_Data <- convert_list_to_df(LASSO_F1, LASSO_F1_LB, LASSO_F1_UB, "LASSO")
+FS_F1_Data <- convert_list_to_df(FS_F1, FS_F1_LB, FS_F1_UB, "FS")
+L0Learn_F1_Data <- convert_list_to_df(L0Learn_F1, L0Learn_F1_LB, L0Learn_F1_UB, "L0Learn")
+
+F1_Data <- rbind(COMBSSV1_F1_Data, COMBSSV2_F1_Data, COMBSS_OPT_F1_Data, LASSO_F1_Data, FS_F1_Data, L0Learn_F1_Data)
+
+# Convert SE Data
+COMBSSV1_SE_Data <- convert_list_to_df(COMBSSV1_SE, COMBSSV1_SE_LB, COMBSSV1_SE_UB, "COMBSS-Mod: FGD")
+COMBSSV2_SE_Data <- convert_list_to_df(COMBSSV2_SE, COMBSSV2_SE_LB, COMBSSV2_SE_UB, "COMBSS-Mod: BCD")
+COMBSS_OPT_SE_Data <- convert_list_to_df(COMBSS_OPT_SE, COMBSS_OPT_SE_LB, COMBSS_OPT_SE_UB, "Refined COMBSS")
+LASSO_SE_Data <- convert_list_to_df(LASSO_SE, LASSO_SE_LB, LASSO_SE_UB, "LASSO")
+FS_SE_Data <- convert_list_to_df(FS_SE, FS_SE_LB, FS_SE_UB, "FS")
+L0Learn_SE_Data <- convert_list_to_df(L0Learn_SE, L0Learn_SE_LB, L0Learn_SE_UB, "L0Learn")
+
+SE_Data <- rbind(COMBSSV1_SE_Data, COMBSSV2_SE_Data, COMBSS_OPT_SE_Data, LASSO_SE_Data, FS_SE_Data, L0Learn_SE_Data)
+
+# Convert SP Data
+COMBSSV1_SP_Data <- convert_list_to_df(COMBSSV1_SP, COMBSSV1_SP_LB, COMBSSV1_SP_UB, "COMBSS-Mod: FGD")
+COMBSSV2_SP_Data <- convert_list_to_df(COMBSSV2_SP, COMBSSV2_SP_LB, COMBSSV2_SP_UB, "COMBSS-Mod: BCD")
+COMBSS_OPT_SP_Data <- convert_list_to_df(COMBSS_OPT_SP, COMBSS_OPT_SP_LB, COMBSS_OPT_SP_UB, "Refined COMBSS")
+LASSO_SP_Data <- convert_list_to_df(LASSO_SP, LASSO_SP_LB, LASSO_SP_UB, "LASSO")
+FS_SP_Data <- convert_list_to_df(FS_SP, FS_SP_LB, FS_SP_UB, "FS")
+L0Learn_SP_Data <- convert_list_to_df(L0Learn_SP, L0Learn_SP_LB, L0Learn_SP_UB, "L0Learn")
+
+SP_Data <- rbind(COMBSSV1_SP_Data, COMBSSV2_SP_Data, COMBSS_OPT_SP_Data, LASSO_SP_Data, FS_SP_Data, L0Learn_SP_Data)
+
+# Convert Time Data
+COMBSSV1_TIME_Data <- convert_list_to_df(COMBSSV1_TIME, COMBSSV1_TIME_LB, COMBSSV1_TIME_UB, "COMBSS-Mod: FGD")
+COMBSSV2_TIME_Data <- convert_list_to_df(COMBSSV2_TIME, COMBSSV2_TIME_LB, COMBSSV2_TIME_UB, "COMBSS-Mod: BCD")
+COMBSS_OPT_TIME_Data <- convert_list_to_df(COMBSS_OPT_TIME, COMBSS_OPT_TIME_LB, COMBSS_OPT_TIME_UB, "Refined COMBSS")
+
+TIME_Data <- rbind(COMBSSV1_TIME_Data, COMBSSV2_TIME_Data, COMBSS_OPT_TIME_Data)
+```
+
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+MCC_HD <- # Base plot with error bars, lines, and points
+ggplot(MCC_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(MCC_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 1", x = "Signal to Noise Ratio", y = "MCC") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and boHD title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "COMBSS-Mod: FGD" = "deeppink3",
+    "COMBSS-Mod: BCD" = "royalblue3",
+    "Refined COMBSS" = "gold",
+    "FS" = "darkolivegreen3", 
+    "L0Learn" = "steelblue2", 
+    "LASSO" = "mediumpurple1"
+  )) +
+  theme(aspect.ratio = 1)
+
+MCC_HD
+ggsave("CH6-MCC-HD-Case-1.png", plot = MCC_HD, dpi = 1200)
+
+```
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+PE_HD <- # Base plot with error bars, lines, and points
+ggplot(PE_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 1", x = "Signal to Noise Ratio", y = "Prediction Error") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and boHD title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "COMBSS-Mod: FGD" = "deeppink3",
+    "COMBSS-Mod: BCD" = "royalblue3",
+    "Refined COMBSS" = "gold",
+    "FS" = "darkolivegreen3", 
+    "L0Learn" = "steelblue2", 
+    "LASSO" = "mediumpurple1"
+  )) +
+  theme(aspect.ratio = 1)
+
+PE_HD
+ggsave("CH6-PE_HD-Case-1.png", plot = PE_HD, dpi = 1200)
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+F1_HD <- # Base plot with error bars, lines, and points
+ggplot(F1_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 1", x = "Signal to Noise Ratio", y = "F1 Score") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and boHD title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+ scale_color_manual(values = c(
+    "COMBSS-Mod: FGD" = "deeppink3",
+    "COMBSS-Mod: BCD" = "royalblue3",
+    "Refined COMBSS" = "gold",
+    "FS" = "darkolivegreen3", 
+    "L0Learn" = "steelblue2", 
+    "LASSO" = "mediumpurple1"
+  )) +
+  theme(aspect.ratio = 1)
+
+F1_HD
+ggsave("CH6-F1_HD-Case-1.png", plot = F1_HD, dpi = 1200)
+```
+
+
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+SE_HD <- # Base plot with error bars, lines, and points
+ggplot(SE_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 1", x = "Signal to Noise Ratio", y = "Sensitivity") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and boHD title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "COMBSS-Mod: FGD" = "deeppink3",
+    "COMBSS-Mod: BCD" = "royalblue3",
+    "Refined COMBSS" = "gold",
+    "FS" = "darkolivegreen3", 
+    "L0Learn" = "steelblue2", 
+    "LASSO" = "mediumpurple1"
+  )) +
+  theme(aspect.ratio = 1)
+
+SE_HD
+ggsave("CH6-SE_HD-Case-1.png", plot = SE_HD, dpi = 1200)
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+SP_HD <- # Base plot with error bars, lines, and points
+ggplot(SP_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 1", x = "Signal to Noise Ratio", y = "Specificity") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and boHD title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "COMBSS-Mod: FGD" = "deeppink3",
+    "COMBSS-Mod: BCD" = "royalblue3",
+    "Refined COMBSS" = "gold",
+    "FS" = "darkolivegreen3", 
+    "L0Learn" = "steelblue2", 
+    "LASSO" = "mediumpurple1"
+  )) +
+  theme(aspect.ratio = 1)
+
+SP_HD
+ggsave("CH6-SP_HD-Case-1.png", plot = SP_HD, dpi = 1200)
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+TIME_HD <- # Base plot with error bars, lines, and points
+ggplot(TIME_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(TIME_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 1", x = "Signal to Noise Ratio", y = "Average Time per Dataset") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and boHD title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "COMBSS-Mod: FGD" = "deeppink3",
+    "COMBSS-Mod: BCD" = "royalblue3",
+    "Refined COMBSS" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+TIME_HD
+ggsave("CH6-TIME_HD-Case-1.png", plot = TIME_HD, dpi = 1200)
+```

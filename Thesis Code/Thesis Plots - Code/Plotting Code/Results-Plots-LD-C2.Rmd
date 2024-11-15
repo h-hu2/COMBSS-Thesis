@@ -1,0 +1,645 @@
+---
+title: "Thesis Plotting"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+```{r}
+# Refresh Data
+rm(list = ls())
+```
+
+```{r}
+# Refresh Terminal
+cat("\014")
+```
+```{r}
+library(tidyverse)
+
+FS_MCC <- list()
+FS_MCC_LB <- list()
+FS_MCC_UB <- list()
+
+LASSO_MCC <- list()
+LASSO_MCC_LB <- list()
+LASSO_MCC_UB <- list()
+
+L0Learn_MCC <- list()
+L0Learn_MCC_LB <- list()
+L0Learn_MCC_UB <- list()
+
+COMBSS_MCC <- list()
+COMBSS_MCC_LB <- list()
+COMBSS_MCC_UB <- list()
+
+MIO_MCC <- list()
+MIO_MCC_LB <- list()
+MIO_MCC_UB <- list()
+
+
+FS_F1 <- list()
+FS_F1_LB <- list()
+FS_F1_UB <- list()
+
+LASSO_F1 <- list()
+LASSO_F1_LB <- list()
+LASSO_F1_UB <- list()
+
+L0Learn_F1 <- list()
+L0Learn_F1_LB <- list()
+L0Learn_F1_UB <- list()
+
+COMBSS_F1 <- list()
+COMBSS_F1_LB <- list()
+COMBSS_F1_UB <- list()
+
+MIO_F1 <- list()
+MIO_F1_LB <- list()
+MIO_F1_UB <- list()
+
+
+FS_PE <- list()
+FS_PE_LB <- list()
+FS_PE_UB <- list()
+
+LASSO_PE <- list()
+LASSO_PE_LB <- list()
+LASSO_PE_UB <- list()
+
+L0Learn_PE <- list()
+L0Learn_PE_LB <- list()
+L0Learn_PE_UB <- list()
+
+COMBSS_PE <- list()
+COMBSS_PE_LB <- list()
+COMBSS_PE_UB <- list()
+
+MIO_PE <- list()
+MIO_PE_LB <- list()
+MIO_PE_UB <- list()
+
+FS_ACC <- list()
+FS_ACC_LB <- list()
+FS_ACC_UB <- list()
+
+LASSO_ACC <- list()
+LASSO_ACC_LB <- list()
+LASSO_ACC_UB <- list()
+
+L0Learn_ACC <- list()
+L0Learn_ACC_LB <- list()
+L0Learn_ACC_UB <- list()
+
+COMBSS_ACC <- list()
+COMBSS_ACC_LB <- list()
+COMBSS_ACC_UB <- list()
+
+MIO_ACC <- list()
+MIO_ACC_LB <- list()
+MIO_ACC_UB <- list()
+
+FS_SE <- list()
+FS_SE_LB <- list()
+FS_SE_UB <- list()
+
+LASSO_SE <- list()
+LASSO_SE_LB <- list()
+LASSO_SE_UB <- list()
+
+L0Learn_SE <- list()
+L0Learn_SE_LB <- list()
+L0Learn_SE_UB <- list()
+
+COMBSS_SE <- list()
+COMBSS_SE_LB <- list()
+COMBSS_SE_UB <- list()
+
+MIO_SE <- list()
+MIO_SE_LB <- list()
+MIO_SE_UB <- list()
+
+FS_SP <- list()
+FS_SP_LB <- list()
+FS_SP_UB <- list()
+
+LASSO_SP <- list()
+LASSO_SP_LB <- list()
+LASSO_SP_UB <- list()
+
+L0Learn_SP <- list()
+L0Learn_SP_LB <- list()
+L0Learn_SP_UB <- list()
+
+COMBSS_SP <- list()
+COMBSS_SP_LB <- list()
+COMBSS_SP_UB <- list()
+
+MIO_SP <- list()
+MIO_SP_LB <- list()
+MIO_SP_UB <- list()
+```
+
+
+
+```{r}
+# Loop through SNR values and read corresponding Metric files
+N <- 50
+for (snr in c(0.5,1,2,3,4,5,6,7,8)) {
+  file_path <- paste0("OriginalResults/OtherMethods/LowC2/Result-n-100-p-20-SNR-", snr, "-rho-0.8-case-2-nsim-50.RData")
+  load(file_path)
+  
+  # MCC Results
+  MCC <- simu.result$MCC
+  FS_Mean <- mean(MCC[,2])
+  FS_SD <- sd(MCC[,2])
+  FS_MCC[[as.character(snr)]] <- FS_Mean
+  FS_MCC_LB[[as.character(snr)]] <- FS_Mean - FS_SD / sqrt(N)
+  FS_MCC_UB[[as.character(snr)]] <- FS_Mean + FS_SD / sqrt(N)
+  
+  LASSO_Mean <- mean(MCC[,4])
+  LASSO_SD <- sd(MCC[,4])
+  LASSO_MCC[[as.character(snr)]] <- LASSO_Mean
+  LASSO_MCC_LB[[as.character(snr)]] <- LASSO_Mean - LASSO_SD / sqrt(N)
+  LASSO_MCC_UB[[as.character(snr)]] <- LASSO_Mean + LASSO_SD / sqrt(N)
+  
+  L0Learn_Mean <- mean(MCC[,8], na.rm = TRUE)
+  L0Learn_SD <- sd(MCC[,8],na.rm = TRUE)
+  L0Learn_MCC[[as.character(snr)]] <- L0Learn_Mean
+  L0Learn_MCC_LB[[as.character(snr)]] <- L0Learn_Mean - L0Learn_SD / sqrt(N)
+  L0Learn_MCC_UB[[as.character(snr)]] <- L0Learn_Mean + L0Learn_SD / sqrt(N)
+  
+  MIO_Mean <- mean(MCC[,3])
+  MIO_SD <- sd(MCC[,3])
+  MIO_MCC[[as.character(snr)]] <- MIO_Mean
+  MIO_MCC_LB[[as.character(snr)]] <- MIO_Mean - MIO_SD / sqrt(N)
+  MIO_MCC_UB[[as.character(snr)]] <- MIO_Mean + MIO_SD / sqrt(N)
+  
+  # Prediction Error Results
+  PE <- simu.result$PE
+  FS_Mean <- mean(PE[,2])
+  FS_SD <- sd(PE[,2])
+  FS_PE[[as.character(snr)]] <- FS_Mean
+  FS_PE_LB[[as.character(snr)]] <- FS_Mean - FS_SD / sqrt(N)
+  FS_PE_UB[[as.character(snr)]] <- FS_Mean + FS_SD / sqrt(N)
+  
+  LASSO_Mean <- mean(PE[,4])
+  LASSO_SD <- sd(PE[,4])
+  LASSO_PE[[as.character(snr)]] <- LASSO_Mean
+  LASSO_PE_LB[[as.character(snr)]] <- LASSO_Mean - LASSO_SD / sqrt(N)
+  LASSO_PE_UB[[as.character(snr)]] <- LASSO_Mean + LASSO_SD / sqrt(N)
+  
+  L0Learn_Mean <- mean(PE[,8])
+  L0Learn_SD <- sd(PE[,8])
+  L0Learn_PE[[as.character(snr)]] <- L0Learn_Mean
+  L0Learn_PE_LB[[as.character(snr)]] <- L0Learn_Mean - L0Learn_SD / sqrt(N)
+  L0Learn_PE_UB[[as.character(snr)]] <- L0Learn_Mean + L0Learn_SD / sqrt(N)
+  
+  MIO_Mean <- mean(PE[,3])
+  MIO_SD <- sd(PE[,3])
+  MIO_PE[[as.character(snr)]] <- MIO_Mean
+  MIO_PE_LB[[as.character(snr)]] <- MIO_Mean - MIO_SD / sqrt(N)
+  MIO_PE_UB[[as.character(snr)]] <- MIO_Mean + MIO_SD / sqrt(N)
+  
+  # Accuracy Results
+  ACC <- simu.result$ACC
+  FS_Mean <- mean(ACC[,2])
+  FS_SD <- sd(ACC[,2])
+  FS_ACC[[as.character(snr)]] <- FS_Mean
+  FS_ACC_LB[[as.character(snr)]] <- FS_Mean - FS_SD / sqrt(N)
+  FS_ACC_UB[[as.character(snr)]] <- FS_Mean + FS_SD / sqrt(N)
+  
+  LASSO_Mean <- mean(ACC[,4])
+  LASSO_SD <- sd(ACC[,4])
+  LASSO_ACC[[as.character(snr)]] <- LASSO_Mean
+  LASSO_ACC_LB[[as.character(snr)]] <- LASSO_Mean - LASSO_SD / sqrt(N)
+  LASSO_ACC_UB[[as.character(snr)]] <- LASSO_Mean + LASSO_SD / sqrt(N)
+  
+  L0Learn_Mean <- mean(ACC[,8])
+  L0Learn_SD <- sd(ACC[,8])
+  L0Learn_ACC[[as.character(snr)]] <- L0Learn_Mean
+  L0Learn_ACC_LB[[as.character(snr)]] <- L0Learn_Mean - L0Learn_SD / sqrt(N)
+  L0Learn_ACC_UB[[as.character(snr)]] <- L0Learn_Mean + L0Learn_SD / sqrt(N)
+
+  MIO_Mean <- mean(ACC[,3])
+  MIO_SD <- sd(ACC[,3])
+  MIO_ACC[[as.character(snr)]] <- MIO_Mean
+  MIO_ACC_LB[[as.character(snr)]] <- MIO_Mean - MIO_SD / sqrt(N)
+  MIO_ACC_UB[[as.character(snr)]] <- MIO_Mean + MIO_SD / sqrt(N)
+  
+  # F1 Score Results
+  F1 <- simu.result$F1
+  FS_Mean <- mean(F1[,2])
+  FS_SD <- sd(F1[,2])
+  FS_F1[[as.character(snr)]] <- FS_Mean
+  FS_F1_LB[[as.character(snr)]] <- FS_Mean - FS_SD / sqrt(N)
+  FS_F1_UB[[as.character(snr)]] <- FS_Mean + FS_SD / sqrt(N)
+  
+  LASSO_Mean <- mean(F1[,4])
+  LASSO_SD <- sd(F1[,4])
+  LASSO_F1[[as.character(snr)]] <- LASSO_Mean
+  LASSO_F1_LB[[as.character(snr)]] <- LASSO_Mean - LASSO_SD / sqrt(N)
+  LASSO_F1_UB[[as.character(snr)]] <- LASSO_Mean + LASSO_SD / sqrt(N)
+  
+  L0Learn_Mean <- mean(F1[,8])
+  L0Learn_SD <- sd(F1[,8])
+  L0Learn_F1[[as.character(snr)]] <- L0Learn_Mean
+  L0Learn_F1_LB[[as.character(snr)]] <- L0Learn_Mean - L0Learn_SD / sqrt(N)
+  L0Learn_F1_UB[[as.character(snr)]] <- L0Learn_Mean + L0Learn_SD / sqrt(N)
+
+  MIO_Mean <- mean(F1[,3])
+  MIO_SD <- sd(F1[,3])
+  MIO_F1[[as.character(snr)]] <- MIO_Mean
+  MIO_F1_LB[[as.character(snr)]] <- MIO_Mean - MIO_SD / sqrt(N)
+  MIO_F1_UB[[as.character(snr)]] <- MIO_Mean + MIO_SD / sqrt(N)
+  
+  # Sensitivity Results
+  SE <- simu.result$Sens
+  FS_Mean <- mean(SE[,2])
+  FS_SD <- sd(SE[,2])
+  FS_SE[[as.character(snr)]] <- FS_Mean
+  FS_SE_LB[[as.character(snr)]] <- FS_Mean - FS_SD / sqrt(N)
+  FS_SE_UB[[as.character(snr)]] <- FS_Mean + FS_SD / sqrt(N)
+  
+  LASSO_Mean <- mean(SE[,4])
+  LASSO_SD <- sd(SE[,4])
+  LASSO_SE[[as.character(snr)]] <- LASSO_Mean
+  LASSO_SE_LB[[as.character(snr)]] <- LASSO_Mean - LASSO_SD / sqrt(N)
+  LASSO_SE_UB[[as.character(snr)]] <- LASSO_Mean + LASSO_SD / sqrt(N)
+  
+  L0Learn_Mean <- mean(SE[,8])
+  L0Learn_SD <- sd(SE[,8])
+  L0Learn_SE[[as.character(snr)]] <- L0Learn_Mean
+  L0Learn_SE_LB[[as.character(snr)]] <- L0Learn_Mean - L0Learn_SD / sqrt(N)
+  L0Learn_SE_UB[[as.character(snr)]] <- L0Learn_Mean + L0Learn_SD / sqrt(N)
+  
+  MIO_Mean <- mean(SE[,3])
+  MIO_SD <- sd(SE[,3])
+  MIO_SE[[as.character(snr)]] <- MIO_Mean
+  MIO_SE_LB[[as.character(snr)]] <- MIO_Mean - MIO_SD / sqrt(N)
+  MIO_SE_UB[[as.character(snr)]] <- MIO_Mean + MIO_SD / sqrt(N)
+  
+  # Specificity Results
+  SP <- simu.result$Spe
+  FS_Mean <- mean(SP[,2])
+  FS_SD <- sd(SP[,2])
+  FS_SP[[as.character(snr)]] <- FS_Mean
+  FS_SP_LB[[as.character(snr)]] <- FS_Mean - FS_SD / sqrt(N)
+  FS_SP_UB[[as.character(snr)]] <- FS_Mean + FS_SD / sqrt(N)
+  
+  LASSO_Mean <- mean(SP[,4])
+  LASSO_SD <- sd(SP[,4])
+  LASSO_SP[[as.character(snr)]] <- LASSO_Mean
+  LASSO_SP_LB[[as.character(snr)]] <- LASSO_Mean - LASSO_SD / sqrt(N)
+  LASSO_SP_UB[[as.character(snr)]] <- LASSO_Mean + LASSO_SD / sqrt(N)
+  
+  L0Learn_Mean <- mean(SP[,8])
+  L0Learn_SD <- sd(SP[,8])
+  L0Learn_SP[[as.character(snr)]] <- L0Learn_Mean
+  L0Learn_SP_LB[[as.character(snr)]] <- L0Learn_Mean - L0Learn_SD / sqrt(N)
+  L0Learn_SP_UB[[as.character(snr)]] <- L0Learn_Mean + L0Learn_SD / sqrt(N)
+  
+  MIO_Mean <- mean(SP[,3])
+  MIO_SD <- sd(SP[,3])
+  MIO_SP[[as.character(snr)]] <- MIO_Mean
+  MIO_SP_LB[[as.character(snr)]] <- MIO_Mean - MIO_SD / sqrt(N)
+  MIO_SP_UB[[as.character(snr)]] <- MIO_Mean + MIO_SD / sqrt(N)
+}
+```
+
+```{r}
+# Loop through SNR values and read corresponding Metric files
+N <- 50
+for (snr in c(0.5,1,2,3,4,5,6,7,8)) {
+  combss_path = paste0("OriginalResults/COMBSS/COMBSS-case-2-n-100-p-20-q-20-corr-0.8-ninit-1-snr-", snr, "-ndatasets-50.csv")
+  combss_data <- read.csv(combss_path)
+
+  MCC <- combss_data$MCC
+  COMBSS_Mean <- mean(MCC)
+  COMBSS_SD <- sd(MCC)
+  COMBSS_MCC[[as.character(snr)]] <- COMBSS_Mean
+  COMBSS_MCC_LB[[as.character(snr)]] <- COMBSS_Mean - COMBSS_SD / sqrt(N)
+  COMBSS_MCC_UB[[as.character(snr)]] <- COMBSS_Mean + COMBSS_SD / sqrt(N)
+  
+  # Prediction Error Results
+  PE <- combss_data$PE
+  COMBSS_Mean <- mean(PE)
+  COMBSS_SD <- sd(PE)
+  COMBSS_PE[[as.character(snr)]] <- COMBSS_Mean
+  COMBSS_PE_LB[[as.character(snr)]] <- COMBSS_Mean - COMBSS_SD / sqrt(N)
+  COMBSS_PE_UB[[as.character(snr)]] <- COMBSS_Mean + COMBSS_SD / sqrt(N)
+  
+  # Accuracy Results
+  F1 <- combss_data$Accuracy
+  COMBSS_Mean <- mean(F1)
+  COMBSS_SD <- sd(F1)
+  COMBSS_F1[[as.character(snr)]] <- COMBSS_Mean
+  COMBSS_F1_LB[[as.character(snr)]] <- COMBSS_Mean - COMBSS_SD / sqrt(N)
+  COMBSS_F1_UB[[as.character(snr)]] <- COMBSS_Mean + COMBSS_SD / sqrt(N)
+  
+  # Accuracy Results
+  ACC <- combss_data$Accuracy
+  COMBSS_Mean <- mean(ACC)
+  COMBSS_SD <- sd(ACC)
+  COMBSS_ACC[[as.character(snr)]] <- COMBSS_Mean
+  COMBSS_ACC_LB[[as.character(snr)]] <- COMBSS_Mean - COMBSS_SD / sqrt(N)
+  COMBSS_ACC_UB[[as.character(snr)]] <- COMBSS_Mean + COMBSS_SD / sqrt(N)
+  
+  
+  # Sensitivity Results
+  SE <- combss_data$Sensitivity
+  COMBSS_Mean <- mean(SE)
+  COMBSS_SD <- sd(SE)
+  COMBSS_SE[[as.character(snr)]] <- COMBSS_Mean
+  COMBSS_SE_LB[[as.character(snr)]] <- COMBSS_Mean - COMBSS_SD / sqrt(N)
+  COMBSS_SE_UB[[as.character(snr)]] <- COMBSS_Mean + COMBSS_SD / sqrt(N)
+  
+  # Specificity Results
+  SP <- combss_data$Specificity
+  COMBSS_Mean <- mean(SP)
+  COMBSS_SD <- sd(SP)
+  COMBSS_SP[[as.character(snr)]] <- COMBSS_Mean
+  COMBSS_SP_LB[[as.character(snr)]] <- COMBSS_Mean - COMBSS_SD / sqrt(N)
+  COMBSS_SP_UB[[as.character(snr)]] <- COMBSS_Mean + COMBSS_SD / sqrt(N)
+}
+```
+
+
+```{r}
+convert_list_to_df <- function(means, lower, upper, method_name) {
+  data.frame(
+    SNR = as.numeric(names(means)),
+    Mean = unlist(means),
+    Lower = unlist(lower),
+    Upper = unlist(upper),
+    Method = method_name
+  )
+}
+
+# Convert MCC Data
+LASSO_MCC_Data <- convert_list_to_df(LASSO_MCC, LASSO_MCC_LB, LASSO_MCC_UB, "LASSO")
+FS_MCC_Data <- convert_list_to_df(FS_MCC, FS_MCC_LB, FS_MCC_UB, "FS")
+L0Learn_MCC_Data <- convert_list_to_df(L0Learn_MCC, L0Learn_MCC_LB, L0Learn_MCC_UB, "L0Learn")
+COMBSS_MCC_Data <- convert_list_to_df(COMBSS_MCC, COMBSS_MCC_LB, COMBSS_MCC_UB, "COMBSS")
+MIO_MCC_Data <- convert_list_to_df(MIO_MCC, MIO_MCC_LB, MIO_MCC_UB, "MIO")
+
+MCC_Data <- rbind(FS_MCC_Data, LASSO_MCC_Data, L0Learn_MCC_Data, COMBSS_MCC_Data, MIO_MCC_Data)
+
+# Convert PE Data
+LASSO_PE_Data <- convert_list_to_df(LASSO_PE, LASSO_PE_LB, LASSO_PE_UB, "LASSO")
+FS_PE_Data <- convert_list_to_df(FS_PE, FS_PE_LB, FS_PE_UB, "FS")
+L0Learn_PE_Data <- convert_list_to_df(L0Learn_PE, L0Learn_PE_LB, L0Learn_PE_UB, "L0Learn")
+COMBSS_PE_Data <- convert_list_to_df(COMBSS_PE, COMBSS_PE_LB, COMBSS_PE_UB, "COMBSS")
+MIO_PE_Data <- convert_list_to_df(MIO_PE, MIO_PE_LB, MIO_PE_UB, "MIO")
+
+PE_Data <- rbind(FS_PE_Data, LASSO_PE_Data, L0Learn_PE_Data, COMBSS_PE_Data, MIO_PE_Data)
+
+# Convert F1 Data
+LASSO_F1_Data <- convert_list_to_df(LASSO_F1, LASSO_F1_LB, LASSO_F1_UB, "LASSO")
+FS_F1_Data <- convert_list_to_df(FS_F1, FS_F1_LB, FS_F1_UB, "FS")
+L0Learn_F1_Data <- convert_list_to_df(L0Learn_F1, L0Learn_F1_LB, L0Learn_F1_UB, "L0Learn")
+COMBSS_F1_Data <- convert_list_to_df(COMBSS_F1, COMBSS_F1_LB, COMBSS_F1_UB, "COMBSS")
+MIO_F1_Data <- convert_list_to_df(MIO_F1, MIO_F1_LB, MIO_F1_UB, "MIO")
+
+F1_Data <- rbind(FS_F1_Data, LASSO_F1_Data, L0Learn_F1_Data, COMBSS_F1_Data, MIO_F1_Data)
+
+# Convert ACC Data
+LASSO_ACC_Data <- convert_list_to_df(LASSO_ACC, LASSO_ACC_LB, LASSO_ACC_UB, "LASSO")
+FS_ACC_Data <- convert_list_to_df(FS_ACC, FS_ACC_LB, FS_ACC_UB, "FS")
+L0Learn_ACC_Data <- convert_list_to_df(L0Learn_ACC, L0Learn_ACC_LB, L0Learn_ACC_UB, "L0Learn")
+COMBSS_ACC_Data <- convert_list_to_df(COMBSS_ACC, COMBSS_ACC_LB, COMBSS_ACC_UB, "COMBSS")
+MIO_ACC_Data <- convert_list_to_df(MIO_ACC, MIO_ACC_LB, MIO_ACC_UB, "MIO")
+
+ACC_Data <- rbind(FS_ACC_Data, LASSO_ACC_Data, L0Learn_ACC_Data, COMBSS_ACC_Data, MIO_ACC_Data)
+
+# Convert SE Data
+LASSO_SE_Data <- convert_list_to_df(LASSO_SE, LASSO_SE_LB, LASSO_SE_UB, "LASSO")
+FS_SE_Data <- convert_list_to_df(FS_SE, FS_SE_LB, FS_SE_UB, "FS")
+L0Learn_SE_Data <- convert_list_to_df(L0Learn_SE, L0Learn_SE_LB, L0Learn_SE_UB, "L0Learn")
+COMBSS_SE_Data <- convert_list_to_df(COMBSS_SE, COMBSS_SE_LB, COMBSS_SE_UB, "COMBSS")
+MIO_SE_Data <- convert_list_to_df(MIO_SE, MIO_SE_LB, MIO_SE_UB, "MIO")
+
+SE_Data <- rbind(FS_SE_Data, LASSO_SE_Data, L0Learn_SE_Data, COMBSS_SE_Data, MIO_SE_Data)
+
+# Convert SP Data
+LASSO_SP_Data <- convert_list_to_df(LASSO_SP, LASSO_SP_LB, LASSO_SP_UB, "LASSO")
+FS_SP_Data <- convert_list_to_df(FS_SP, FS_SP_LB, FS_SP_UB, "FS")
+L0Learn_SP_Data <- convert_list_to_df(L0Learn_SP, L0Learn_SP_LB, L0Learn_SP_UB, "L0Learn")
+COMBSS_SP_Data <- convert_list_to_df(COMBSS_SP, COMBSS_SP_LB, COMBSS_SP_UB, "COMBSS")
+MIO_SP_Data <- convert_list_to_df(MIO_SP, MIO_SP_LB, MIO_SP_UB, "MIO")
+
+SP_Data <- rbind(FS_SP_Data, LASSO_SP_Data, L0Learn_SP_Data, COMBSS_SP_Data, MIO_SP_Data)
+```
+
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+MCC_LD <- # Base plot with error bars, lines, and points
+ggplot(MCC_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(MCC_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 2", x = "Signal to Noise Ratio", y = "MCC") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and bold title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "COMBSS" = "salmon", 
+    "FS" = "darkolivegreen3", 
+    "L0Learn" = "steelblue2", 
+    "LASSO" = "mediumpurple1",
+    "MIO" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+MCC_LD
+ggsave("MCC-LD-case-2.png", plot = MCC_LD, dpi = 1200)
+
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+PE_LD <- # Base plot with error bars, lines, and points
+ggplot(PE_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 2", x = "Signal to Noise Ratio", y = "Prediction Error") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and bold title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "COMBSS" = "salmon", 
+    "FS" = "darkolivegreen3", 
+    "L0Learn" = "steelblue2", 
+    "LASSO" = "mediumpurple1",
+    "MIO" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+PE_LD
+ggsave("PE-LD-case-2.png", plot = PE_LD, dpi = 1200)
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+ACC_LD <- # Base plot with error bars, lines, and points
+ggplot(PE_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 2", x = "Signal to Noise Ratio", y = "Accuracy") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and bold title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "COMBSS" = "salmon", 
+    "FS" = "darkolivegreen3", 
+    "L0Learn" = "steelblue2", 
+    "LASSO" = "mediumpurple1",
+    "MIO" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+ACC_LD
+ggsave("ACC-LD-case-2.png", plot = PE_LD, dpi = 1200)
+```
+
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+F1_LD <- # Base plot with error bars, lines, and points
+ggplot(F1_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 2", x = "Signal to Noise Ratio", y = "F1 Score") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and bold title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "COMBSS" = "salmon", 
+    "FS" = "darkolivegreen3", 
+    "L0Learn" = "steelblue2", 
+    "LASSO" = "mediumpurple1",
+    "MIO" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+F1_LD
+ggsave("F1-LD-case-2.png", plot = F1_LD, dpi = 1200)
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+SE_LD <- # Base plot with error bars, lines, and points
+ggplot(SE_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 2", x = "Signal to Noise Ratio", y = "Sensitivity") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and bold title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "COMBSS" = "salmon", 
+    "FS" = "darkolivegreen3", 
+    "L0Learn" = "steelblue2", 
+    "LASSO" = "mediumpurple1",
+    "MIO" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+SE_LD
+ggsave("SE-LD-case-2.png", plot = SE_LD, dpi = 1200)
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+
+SP_LD <- # Base plot with error bars, lines, and points
+ggplot(SP_Data, aes(x = SNR, y = Mean, color = Method)) +
+  geom_line(size = 0.5) +  # Thinner lines
+  geom_point(size = 0.5) +  # Smaller points
+  scale_x_continuous(breaks = unique(PE_Data$SNR)) +
+  geom_pointrange(aes(ymin = Lower, ymax = Upper), size = 0.15, show.legend = FALSE) +  # Adjust error bar thickness
+  labs(title = "Case 2", x = "Signal to Noise Ratio", y = "Specificity") +  # Title and labels
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",  # Place legend at the bottom
+    legend.title = element_blank(),  # Remove legend title
+    legend.text = element_text(size = 8),  # Smaller legend text
+    plot.title = element_text(size = 12, hjust = 0.5),  # Centered and bold title
+    axis.title = element_text(size = 10),  # Larger axis titles
+    axis.text = element_text(size = 8),  # Larger axis text
+    panel.grid.minor = element_line(size = 0.25, color = "grey80"),  # Remove minor gridlines
+    panel.grid.major = element_line(size = 0.25, color = "grey80")  # Subtle major gridlines
+  ) +
+  scale_color_manual(values = c(
+    "COMBSS" = "salmon", 
+    "FS" = "darkolivegreen3", 
+    "L0Learn" = "steelblue2", 
+    "LASSO" = "mediumpurple1",
+    "MIO" = "gold"
+  )) +
+  theme(aspect.ratio = 1)
+
+SP_LD
+ggsave("SP-LD-case-2.png", plot = SP_LD, dpi = 1200)
+```

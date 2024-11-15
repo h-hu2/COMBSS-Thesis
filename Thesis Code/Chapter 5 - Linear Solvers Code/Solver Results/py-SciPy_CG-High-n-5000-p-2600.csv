@@ -1,0 +1,2 @@
+solver,n,p,time,sd,convergenceRate,tol
+SciPy CG,5000,2600,0.037260626537688676,0.0036585630443643907,1.0,0.001
